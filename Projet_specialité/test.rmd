@@ -1,0 +1,92 @@
+
+   
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(magrittr)
+knitr::opts_chunk$set(warning = FALSE, message = FALSE) 
+```
+
+
+```{r}
+
+
+simulation = function(mu, sigma, n, dt){
+  m = mu*dt
+  sdd = sqrt(sigma * dt)
+  W = 1:n
+  W[1] = 0
+  for (i in 2:n){
+    W[i] = W[i-1] + rnorm(1, mean = m, sd = sdd)
+  }
+  return (W)
+  
+}
+affichage = function(W, dt){
+  n=length(W)
+  T = 1:n
+  T[1]  = 0
+  for (i in 2:n){
+ 
+    T[i] = (i-1)*dt
+  }
+  plot(T,W, type = "l")
+}
+affichage(simulation(4,10,1000,1),0.1)
+
+
+estimation = function(W, dt){ 
+  n=length(W)
+  X = 1:n
+  X[1] = W[1]
+  for (i in 2:n){
+    X[i]=W[i] - W[i-1] 
+  }
+  mu_estimated=mean(X)/dt
+  sn2 =(n - 1)/n * var(X)
+  sigma_estimated=sn2/dt
+  return (list(mu_estimated,sigma_estimated))
+  
+}
+estimation(simulation(4,5,1000,1),1)
+
+```
+
+
+```{r}
+data <- data.frame(read.csv("laser.csv"))
+
+L<-list(dt$X1, dt$X2)
+n = length(data)
+l = nrow(dt)
+
+estimation = function(X,n,p, dt){ 
+
+  mu= 1:p
+  sigma = 1:p
+  sn2 = 1:p
+
+ 
+  for (i in 1:p){
+  mu[i]=mean(as.vector(unlist(X[i])))/dt
+  
+  sn2[i]=(n - 1)/n * var(as.vector(unlist(X[i])))
+  sigma=sn2[i]/dt
+  }
+  for (j in 1:p){
+  mu_estimated=mean(mu)
+  sigma_estimated=mean(sigma)
+  }
+  return (list(mu_estimated,sigma_estimated))
+}
+  
+estimation(L,n,2, 250)
+mean(as.vector(unlist(L[1])))
+
+
+```
+
+
+   
+
+      
+
